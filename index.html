@@ -1,187 +1,799 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Touch Blackboard</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&display=swap');
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="YOykyV7jEUg5Nj2GeyhHUcewf9WW-Ruyke1v23KePrY" />
+    <title>Haji App Store - Buy & Download Local Apps</title>
+    <meta name="description" content="Purchase and download a collection of useful apps from the Haji App Store. A local online business providing quality APKs.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --primary-hover-color: #0056b3;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
+            --warning-color: #ffc107;
+            --dark-bg: #333;
+            --light-bg: #f4f4f4;
+            --text-color: #333;
+            --light-text-color: #fff;
+            --border-color: #ddd;
+            --card-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            --card-hover-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            --price-color: #e44d26;
+        }
 
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #333;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      font-family: 'Cabin Sketch', cursive;
-    }
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    .blackboard {
-      background-color: #222;
-      border: 10px solid #8B4513;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-      position: relative;
-      width: 90vw;
-      max-width: 900px;
-      height: 500px;
-      touch-action: none;
-    }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+        }
 
-    canvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-      cursor: crosshair;
-    }
+        .amharic-font {
+            font-family: 'Noto Sans Ethiopic', sans-serif;
+        }
 
-    .clear-btn, .record-btn {
-      position: absolute;
-      padding: 8px 16px;
-      background-color: #444;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
+        .navbar {
+            background-color: var(--dark-bg);
+            color: var(--light-text-color);
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: transform 0.3s ease-in-out;
+        }
 
-    .clear-btn:hover, .record-btn:hover {
-      background-color: #666;
-    }
+        .navbar.navbar-hidden {
+            transform: translateY(-100%);
+        }
 
-    .clear-btn {
-      top: 10px;
-      right: 10px;
-    }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-    .record-btn {
-      top: 50px;
-      right: 10px;
-    }
+        .nav-left, .nav-right {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+        }
 
-    h1 {
-      position: absolute;
-      top: 10px;
-      left: 20px;
-      color: white;
-      font-size: 24px;
-    }
-  </style>
+        .nav-logo {
+            color: var(--light-text-color);
+            text-decoration: none;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-right: 20px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            background-color: #444;
+            border-radius: 20px;
+            padding: 5px 15px;
+            margin-left: 15px;
+        }
+
+        #search-input {
+            background: none;
+            border: none;
+            color: var(--light-text-color);
+            font-size: 1em;
+            outline: none;
+            width: 150px;
+            transition: width 0.3s ease-in-out;
+        }
+
+        #search-input::placeholder {
+            color: #bbb;
+        }
+
+        #search-input:focus {
+            width: 200px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links li {
+            margin-right: 15px;
+        }
+
+        .nav-links a {
+            color: var(--light-text-color);
+            text-decoration: none;
+            padding: 8px 12px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active-filter {
+            background-color: #555;
+            color: #ffe600;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light-text-color);
+            font-size: 2em;
+            cursor: pointer;
+            margin-left: 15px;
+        }
+
+        header {
+            padding: 1rem 0;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        header h2 {
+            background-color: #ffe600;
+            color: black;
+            font-size: 20px;
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background-color: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+
+        .app-icon {
+            max-width: 120px;
+            height: 120px;
+            object-fit: contain;
+            margin: 0 auto 15px auto;
+            border-radius: 15px;
+        }
+
+        .app-rating {
+            font-size: 0.9em;
+            color: var(--warning-color);
+            margin-bottom: 8px;
+        }
+
+        .app-title {
+            font-size: 1.2em;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .app-price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--price-color);
+            margin-bottom: 10px;
+        }
+
+        .app-description {
+            font-size: 0.9em;
+            color: #555;
+            flex-grow: 1;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .app-description .more-text { display: none; }
+
+        .read-more-link {
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: bold;
+            font-size: 0.9em;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        .read-more-link:hover { color: var(--primary-hover-color); }
+
+        .app-meta-info {
+            font-size: 0.8em;
+            color: #777;
+            margin-top: 10px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .app-meta-info span {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .buy-button {
+            display: inline-block;
+            background-color: var(--success-color);
+            color: var(--light-text-color);
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.2s ease;
+            margin-top: auto;
+            border: none;
+            cursor: pointer;
+        }
+
+        .buy-button.free {
+             background-color: var(--primary-color);
+        }
+
+        .buy-button:hover {
+            background-color: var(--success-hover-color);
+        }
+        .buy-button.free:hover {
+            background-color: var(--primary-hover-color);
+        }
+
+        .status-message {
+            display: none;
+            text-align: center;
+            font-size: 1.1em;
+            color: #555;
+            grid-column: 1 / -1;
+            padding: 20px;
+        }
+
+        .load-more-container {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 20px;
+        }
+
+        #load-more-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        #load-more-button:hover { background-color: var(--primary-hover-color); }
+        #load-more-button:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e9ecef;
+            color: #495057;
+            font-size: 0.9em;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* --- New Modal Styles --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+        }
+
+        .modal-container {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            width: 90%;
+            max-width: 500px;
+            text-align: left;
+        }
+
+        .modal-close-button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2em;
+            font-weight: bold;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close-button:hover {
+            color: #333;
+        }
+        
+        .modal-container h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+        
+        .modal-container p {
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+        
+        .modal-container .payment-details {
+            background-color: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+        .modal-container .payment-details strong {
+            color: #333;
+        }
+
+        /* Dropdown styles */
+        .nav-links .dropdown { position: relative; }
+        .nav-links .dropdown .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: #444;
+            list-style: none;
+            padding: 10px 0;
+            margin: 0;
+            border-radius: 0 0 5px 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 200px;
+            z-index: 101;
+        }
+        .nav-links .dropdown:hover .dropdown-menu { display: block; }
+        .nav-links .dropdown .dropdown-menu li { margin: 0; width: 100%; }
+        .nav-links .dropdown .dropdown-menu li a {
+            padding: 10px 15px;
+            width: 100%;
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+        }
+        .nav-links .dropdown .dropdown-menu li a i { margin-right: 10px; font-size: 1.2em; }
+        .nav-links .dropdown .dropdown-menu li a:hover { background-color: #555; }
+
+        /* Responsive Styles */
+        @media (max-width: 992px) {
+            #search-input { width: 120px; }
+            #search-input:focus { width: 160px; }
+            .nav-logo { margin-right: 15px; }
+            .nav-links li { margin-right: 10px; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-container { flex-direction: column; align-items: flex-start; }
+            .nav-logo { margin-bottom: 10px; margin-right: 0; }
+            .nav-left, .nav-right { width: 100%; justify-content: space-between; margin-bottom: 10px; }
+            .nav-left { order: 2; }
+            .nav-right { order: 1; margin-bottom: 0; }
+            .search-container { margin-left: auto; margin-right: 0; }
+            #search-input { width: 100px; }
+            #search-input:focus { width: 120px; }
+            .nav-links { display: none; flex-direction: column; width: 100%; background-color: #444; padding: 10px 0; border-top: 1px solid #555; align-items: flex-start; }
+            .nav-links.active { display: flex; }
+            .nav-links li { margin: 5px 0; text-align: left; width: 100%; margin-right: 0; padding-left: 20px; }
+            .nav-links a { padding: 10px 15px; width: 100%; border-radius: 0; }
+            .menu-toggle { display: block; margin-left: 0; }
+            .nav-links .dropdown .dropdown-menu { display: contents; position: static; box-shadow: none; padding: 0; background-color: transparent; border-radius: 0; width: 100%; }
+            .nav-links .dropdown > a { font-weight: bold; background-color: #3a3a3a; padding-left: 20px; }
+            .nav-links .dropdown .dropdown-menu li a { padding-left: 40px; }
+        }
+
+        @media (max-width: 480px) {
+            .nav-logo { font-size: 1.2em; }
+            #search-input { width: 80px; }
+            #search-input:focus { width: 100px; }
+        }
+    </style>
 </head>
 <body>
-  <div class="blackboard" id="board">
-    <h1>Touch to Write ✍️</h1>
-    <canvas id="chalkboard"></canvas>
-    <button class="clear-btn" onclick="clearCanvas()">Clear</button>
-    <button class="record-btn" id="recordBtn">Start Recording</button>
-  </div>
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="#" class="nav-logo">Haji App Store</a>
+        <div class="nav-left">
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#" data-category="all" class="active-filter">Home</a></li>
+                <li class="dropdown">
+                    <a href="#" onclick="return false;">App Categories</a>
+                    <ul class="dropdown-menu" id="category-dropdown-menu"></ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" onclick="return false;">My Web Apps</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://oxpc1.vercel.app" target="_blank" rel="noopener noreferrer">Online Notepad</a></li>
+                        <li><a href="https://oxpc2.vercel.app" target="_blank" rel="noopener noreferrer">Amharic Keyboard</a></li>
+                        <li><a href="https://oxpc3.vercel.app" target="_blank" rel="noopener noreferrer">Online Whiteboard</a></li>
+                        <li><a href="https://oxpc4.vercel.app" target="_blank" rel="noopener noreferrer">Drive Link Generator</a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="#" onclick="return false;">My Social Media</a>
+                    <ul class="dropdown-menu">
+                        <li><a href="https://play.google.com/store/apps/dev?id=8599195642101564969&hl=en" target="_blank" rel="noopener noreferrer"><i class="fab fa-google-play"></i> My Play Store</a></li>
+                        <li><a href="https://t.me/ahajio2" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram-plane"></i> Telegram Channel</a></li>
+                        <li><a href="https://facebook.com/ahajio1" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook"></i> Facebook Page</a></li>
+                        <li><a href="https://twitter.com/ahajio2" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i> Twitter</a></li>
+                        <li><a href="https://www.youtube.com/@ahajio2" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i> YouTube</a></li>
+                        <li><a href="https://hajif.blogspot.com" target="_blank" rel="noopener noreferrer"><i class="fab fa-blogger"></i> Blogger</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <div class="search-container">
+                <input type="search" id="search-input" placeholder="Search apps..." aria-label="Search apps">
+            </div>
+            <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation menu" aria-expanded="false">☰</button>
+        </div>
+    </div>
+</nav>
 
-  <script>
-    const canvas = document.getElementById('chalkboard');
-    const ctx = canvas.getContext('2d');
+<header>
+    <h2 class="amharic-font">ሰውን በነፃ ማገልገል ትልቅ ፀጋ ነው!</h2>
+</header>
 
-    function resizeCanvas() {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
+<main>
+    <div class="app-grid" id="app-grid">
+        <p class="status-message" id="status-message">Loading apps...</p>
+    </div>
+    <div class="load-more-container" id="load-more-container" style="display: none;">
+        <button id="load-more-button">Load More</button>
+    </div>
+</main>
+
+<!-- New Purchase Modal HTML -->
+<div class="modal-overlay" id="modal-overlay"></div>
+<div class="modal-container" id="modal-container">
+    <span class="modal-close-button" id="modal-close-button">×</span>
+    <h3 id="modal-title">Purchase Instructions</h3>
+    <p>To buy the app "<strong id="modal-app-name">App Name</strong>" for the price of <strong id="modal-app-price">Price</strong>, please follow these steps:</p>
+    
+    <div class="payment-details">
+        <p><strong>Step 1:</strong> Transfer the amount to one of the following accounts:</p>
+        <ul>
+            <li><strong>Commercial Bank:</strong> 1000... (Your CBE Number)</li>
+            <li><strong>Telebirr:</strong> 09... (Your Telebirr Number)</li>
+        </ul>
+        <p><em>Please use the app name as the reason/remark for the transfer.</em></p>
+        <br>
+        <p><strong>Step 2:</strong> After payment, send a screenshot of the receipt to us via Telegram or WhatsApp.</p>
+        <p><strong>Contact Number:</strong> <strong id="modal-contact-number"></strong></p>
+        <br>
+        <p>We will send you the APK file directly once we confirm the payment. Thank you!</p>
+    </div>
+</div>
+
+
+<footer>
+    <p>© <span id="year"></span> Ahmedhaji Sadik | <span id="contact-phone">+251945033132</span></p>
+</footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- DOM Elements ---
+    const appGrid = document.getElementById('app-grid');
+    const statusMessage = document.getElementById('status-message');
+    const searchInput = document.getElementById('search-input');
+    const navLinks = document.getElementById('nav-links');
+    const menuToggle = document.getElementById('menu-toggle');
+    const loadMoreContainer = document.getElementById('load-more-container');
+    const loadMoreButton = document.getElementById('load-more-button');
+    const navbar = document.querySelector('.navbar');
+    const categoryDropdownMenu = document.getElementById('category-dropdown-menu');
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // --- New Modal Elements ---
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalContainer = document.getElementById('modal-container');
+    const modalCloseButton = document.getElementById('modal-close-button');
+    const modalAppName = document.getElementById('modal-app-name');
+    const modalAppPrice = document.getElementById('modal-app-price');
+    const modalContactNumber = document.getElementById('modal-contact-number');
+    const footerContactPhone = document.getElementById('contact-phone').textContent;
+
+    // --- State Variables ---
+    // App data with added 'price' property for the business model
+    let allAppsData = [
+        {
+            "icon": "icons/sadikandsani.webp", "rating": "★★★★☆", "title": "Amharic Quran Tefsir",
+            "description": "Haji Sani Habib Amharic Quran Tefsir App, best for word search index.",
+            "category": "Tools", "version": "1.1.0", "updated": "June 5, 2025", "price": "100 ETB",
+            "downloadLink": "apks/HajiSani-Quran-AppV1.apk"
+        },
+        {
+            "icon": "icons/Nejashi Keyboard.webp", "rating": "★★★★☆", "title": "Nejashi Keyboard",
+            "description": "A powerful Amharic keyboard with advanced features for easy typing. Includes word prediction and customizable themes.",
+            "category": "Tools", "version": "1.2.0", "updated": "Apr 15, 2025", "price": "50 ETB",
+            "downloadLink": "apks/Nejashi Keyboard.apk"
+        },
+        {
+            "icon": "icons/إعراب الآجرومية ኢዕራብ ajrum.webp", "rating": "★★★★★", "title": "إعراب الآجرومية ኢዕራብ ajrum",
+            "description": "Learn Arabic grammar (Nahw) with this interactive app focusing on the I'rab of Al-Ajurrumiyyah متن الآجرومية.",
+            "category": "Education", "version": "2.0.1", "updated": "Mar 28, 2025", "price": "75 ETB",
+            "downloadLink": "apks/إعراب الآجرومية ኢዕራብ ajrum.apk"
+        },
+        {
+            "icon": "icons/አጅሩምያ ኪታብ በአማረኛ.webp", "rating": "★★★★☆", "title": "አጅሩምያ ኪታብ በአማረኛ",
+            "description": "The classic Arabic grammar text Al-Ajurrumiyyah explained in Amharic (በአማረኛ). Essential for students of Arabic.",
+            "category": "Education", "version": "1.5.0", "updated": "Apr 02, 2025", "price": "75 ETB",
+            "downloadLink": "apks/አጅሩምያ ኪታብ በአማረኛ.apk"
+        },
+        {
+            "icon": "icons/Arbaqiin Cadiis Qafár Afa.webp", "rating": "★★★★★", "title": "Arbaqiin Cadiis Qafár Afa",
+            "description": "Imam Nawawi's Forty Hadith (الأربعون النووية) translated into the Afar language (Qafár Afa). Fundamental texts for Muslims.",
+            "category": "Books & Reference", "version": "1.0.0", "updated": "Feb 10, 2025", "price": "50 ETB",
+            "downloadLink": "apks/Arbaqiin Cadiis Qafár Afa.apk"
+        },
+        {
+            "icon": "icons/إعراب القرآن جزء عم.webp", "rating": "★★★★★", "title": "إعراب القرآن جزء عم",
+            "description": "Detailed grammatical analysis (I'rab) of Juz' Amma (الجزء ٣٠) of the Holy Quran. Aids in deeper understanding.",
+            "category": "Education", "version": "1.1.0", "updated": "Jan 22, 2025", "price": "100 ETB",
+            "downloadLink": "apks/إعراب القرآن جزء عم.apk"
+        },
+        {
+            "icon": "icons/التحفة السنية بشرح الآجرومية.webp", "rating": "★★★★★", "title": "التحفة السنية بشرح الآجرومية",
+            "description": "A well-known explanation (Sharh) of Al-Ajurrumiyyah, \"Al-Tuhfah al-Saniyyah\" by Sh. Muhammad Muhyi al-Din Abd al-Hamid.",
+            "category": "Education", "version": "1.3.0", "updated": "Apr 20, 2025", "price": "100 ETB",
+            "downloadLink": "apks/التحفة السنية بشرح الآجرومية.apk"
+        },
+        {
+            "icon": "icons/حصن المسلم Hisnul Muslim Arebi.webp", "rating": "★★★★★", "title": "حصن المسلم Hisnul Muslim Arebi",
+            "description": "The famous collection of supplications and remembrances, \"Fortress of the Muslim\" (Hisnul Muslim - حصن المسلم), in Arabic.",
+            "category": "Books & Reference", "version": "3.0.0", "updated": "Apr 01, 2025", "price": "50 ETB",
+            "downloadLink": "apks/حصن المسلم Hisnul Muslim Arebi.apk"
+        },
+        // --- Examples of Free/Drive link apps ---
+        {
+            "icon": "icons/ICCM and IMNCI 2021 Ethiopia.webp", "rating": "★★★★☆", "title": "ICCM and IMNCI 2021 Ethiopia",
+            "description": "Ethiopian guidelines (2021) for Integrated Community Case Management (ICCM) and Integrated Management of Newborn and Childhood Illness (IMNCI).",
+            "category": "Health & Fitness", "version": "2021 Ed.", "updated": "Circa 2021", "price": "Free",
+            "downloadLink": "https://drive.google.com/uc?export=download&id=1ycARvmBEE0U5YUjN62m3_2bhvryzIRC5"
+        },
+        {
+            "icon": "icons/MAM&SAMEthiopia.webp", "rating": "★★★★☆", "title": "MAM & SAM Ethiopia",
+            "description": "Ethiopian protocols or guidelines for the Management of Moderate Acute Malnutrition (MAM) and Severe Acute Malnutrition (SAM).",
+            "category": "Health & Fitness", "version": "Guideline", "updated": "Unknown", "price": "Free",
+            "downloadLink": "https://drive.google.com/uc?export=download&id=1JBK9dEdh9xTPJ4JdPgbNo9kCHacturX6"
+        }
+        // ... Add the rest of your app data here, each with a "price" key ...
+    ];
+    let filteredAppsData = [];
+    let currentPage = 1;
+    const APPS_PER_PAGE = 8;
+    let lastScrollTop = 0;
+
+    // --- Collapsible Header Logic ---
+    window.addEventListener('scroll', () => {
+        let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        if (scrollTop > lastScrollTop && scrollTop > navbar.offsetHeight) {
+            navbar.classList.add('navbar-hidden');
+        } else {
+            navbar.classList.remove('navbar-hidden');
+        }
+        lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+    }, false);
+
+    const debounce = (func, delay) => {
+        let timeoutId;
+        return (...args) => {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => { func.apply(this, args); }, delay);
+        };
+    };
+
+    // --- Core Functions ---
+    function createAppCardHTML(app) {
+        const maxLength = 80;
+        let descriptionHTML = app.description;
+        if (app.description.length > maxLength) {
+            const visiblePart = app.description.substring(0, app.description.lastIndexOf(' ', maxLength));
+            const hiddenPart = app.description.substring(visiblePart.length).trim();
+            descriptionHTML = `
+                <span class="visible-text">${visiblePart}</span><span class="ellipsis">... </span><span class="more-text">${hiddenPart}</span>
+                <a href="#" class="read-more-link">Read More</a>`;
+        }
+        
+        const isFree = app.price.toLowerCase() === 'free';
+        const buttonText = isFree ? 'Download Free' : 'Buy Now';
+        const buttonClass = isFree ? 'buy-button free' : 'buy-button';
+        
+        return `
+            <div class="app-card">
+                <img src="${app.icon}" alt="Icon for ${app.title}" class="app-icon" loading="lazy" width="120" height="120">
+                <div class="app-rating">${app.rating}</div>
+                <h3 class="app-title">${app.title}</h3>
+                <div class="app-price">${app.price}</div>
+                <p class="app-description">${descriptionHTML}</p>
+                <div class="app-meta-info">
+                    <span class="app-category"><strong>Category:</strong> ${app.category}</span>
+                    <span class="app-version"><strong>Version:</strong> ${app.version}</span>
+                    <span class="app-updated"><strong>Updated:</strong> ${app.updated}</span>
+                </div>
+                <button class="${buttonClass}" data-title="${app.title}" data-price="${app.price}" data-link="${app.downloadLink}">${buttonText}</button>
+            </div>`;
     }
 
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
-
-    ctx.strokeStyle = "#ffffff";
-    ctx.lineWidth = 2;
-    ctx.lineJoin = "round";
-    ctx.lineCap = "round";
-
-    let drawing = false;
-
-    function startDraw(e) {
-      drawing = true;
-      ctx.beginPath();
-      ctx.moveTo(getX(e), getY(e));
-      e.preventDefault();
+    function renderAppCards(appsToRender) {
+        const fragment = document.createDocumentFragment();
+        appsToRender.forEach(app => {
+            const cardWrapper = document.createElement('div');
+            cardWrapper.innerHTML = createAppCardHTML(app);
+            fragment.appendChild(cardWrapper.firstElementChild);
+        });
+        appGrid.appendChild(fragment);
     }
 
-    function draw(e) {
-      if (!drawing) return;
-      ctx.lineTo(getX(e), getY(e));
-      ctx.stroke();
-      e.preventDefault();
+    function loadMoreApps() {
+        const startIndex = (currentPage - 1) * APPS_PER_PAGE;
+        const endIndex = startIndex + APPS_PER_PAGE;
+        const appsToShow = filteredAppsData.slice(startIndex, endIndex);
+        renderAppCards(appsToShow);
+        currentPage++;
+        loadMoreButton.disabled = endIndex >= filteredAppsData.length;
     }
 
-    function endDraw() {
-      drawing = false;
+    function updateAppDisplay() {
+        const searchTerm = searchInput.value.toLowerCase().trim();
+        const activeFilterElement = document.querySelector('.nav-links a.active-filter');
+        const selectedCategory = activeFilterElement ? activeFilterElement.dataset.category : 'all';
+
+        filteredAppsData = allAppsData.filter(app => {
+            const categoryMatch = selectedCategory === 'all' || app.category === selectedCategory;
+            const searchMatch = !searchTerm ||
+                                app.title.toLowerCase().includes(searchTerm) ||
+                                app.description.toLowerCase().includes(searchTerm);
+            return categoryMatch && searchMatch;
+        });
+
+        appGrid.innerHTML = '';
+        currentPage = 1;
+        statusMessage.style.display = 'none';
+
+        if (filteredAppsData.length > 0) {
+            loadMoreContainer.style.display = 'block';
+            loadMoreApps();
+        } else {
+            loadMoreContainer.style.display = 'none';
+            statusMessage.textContent = 'No apps found matching your criteria.';
+            statusMessage.style.display = 'block';
+        }
     }
 
-    function getX(e) {
-      return e.touches ? e.touches[0].clientX - canvas.getBoundingClientRect().left : e.clientX - canvas.getBoundingClientRect().left;
+    function initialize() {
+        const categories = [...new Set(allAppsData.map(app => app.category).filter(Boolean))].sort();
+        const allCategoriesLi = document.createElement('li');
+        allCategoriesLi.innerHTML = `<a href="#" data-category="all">All Categories</a>`;
+        categoryDropdownMenu.appendChild(allCategoriesLi);
+        categories.forEach(category => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="#" data-category="${category}">${category}</a>`;
+            categoryDropdownMenu.appendChild(li);
+        });
+        updateAppDisplay();
+        statusMessage.style.display = 'none';
     }
 
-    function getY(e) {
-      return e.touches ? e.touches[0].clientY - canvas.getBoundingClientRect().top : e.clientY - canvas.getBoundingClientRect().top;
-    }
-
-    canvas.addEventListener("mousedown", startDraw);
-    canvas.addEventListener("mousemove", draw);
-    canvas.addEventListener("mouseup", endDraw);
-    canvas.addEventListener("mouseleave", endDraw);
-
-    canvas.addEventListener("touchstart", startDraw);
-    canvas.addEventListener("touchmove", draw);
-    canvas.addEventListener("touchend", endDraw);
-    canvas.addEventListener("touchcancel", endDraw);
-
-    function clearCanvas() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // Screen Recording Logic
-    let recorder;
-    let recordedChunks = [];
-    const recordBtn = document.getElementById('recordBtn');
-
-    recordBtn.addEventListener('click', () => {
-      if (recordBtn.textContent === "Start Recording") {
-        startRecording();
-      } else {
-        stopRecording();
-      }
+    // --- Event Listeners ---
+    navLinks.addEventListener('click', (e) => {
+        if (e.target.tagName === 'A' && e.target.dataset.category) {
+            e.preventDefault();
+            const currentActive = document.querySelector('.nav-links a.active-filter');
+            if (currentActive) currentActive.classList.remove('active-filter');
+            e.target.classList.add('active-filter');
+            updateAppDisplay();
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        }
     });
 
-    function startRecording() {
-      const stream = canvas.captureStream(30); // 30 FPS
-      recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+    searchInput.addEventListener('input', debounce(updateAppDisplay, 300));
+    loadMoreButton.addEventListener('click', loadMoreApps);
+    menuToggle.addEventListener('click', () => {
+        const isExpanded = navLinks.classList.toggle('active');
+        menuToggle.setAttribute('aria-expanded', isExpanded);
+    });
 
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) recordedChunks.push(e.data);
-      };
+    appGrid.addEventListener('click', (e) => {
+        // "Read More" logic
+        if (e.target.classList.contains('read-more-link')) {
+            e.preventDefault();
+            const link = e.target;
+            const descriptionP = link.parentElement;
+            const moreText = descriptionP.querySelector('.more-text');
+            const ellipsis = descriptionP.querySelector('.ellipsis');
+            const isHidden = !moreText.style.display || moreText.style.display === 'none';
+            moreText.style.display = isHidden ? 'inline' : 'none';
+            ellipsis.style.display = isHidden ? 'none' : 'inline';
+            link.textContent = isHidden ? 'Read Less' : 'Read More';
+        }
+        
+        // --- New "Buy Now" Button Logic ---
+        if (e.target.classList.contains('buy-button')) {
+            const button = e.target;
+            const appPrice = button.dataset.price;
+            const appLink = button.dataset.link;
+            
+            // If the app is free, just start the download
+            if (appPrice.toLowerCase() === 'free') {
+                window.location.href = appLink;
+                return;
+            }
+            
+            // Otherwise, show the purchase modal
+            const appTitle = button.dataset.title;
+            modalAppName.textContent = appTitle;
+            modalAppPrice.textContent = appPrice;
+            modalContactNumber.textContent = footerContactPhone;
+            
+            modalOverlay.style.display = 'block';
+            modalContainer.style.display = 'block';
+        }
+    });
 
-      recorder.onstop = () => {
-        const blob = new Blob(recordedChunks, { type: "video/webm" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "chalkboard_recording.webm";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        recordedChunks = [];
-      };
-
-      recorder.start();
-      recordBtn.textContent = "Stop Recording";
-      recordBtn.style.backgroundColor = "#a00";
+    // --- New Modal Close Logic ---
+    function closeModal() {
+        modalOverlay.style.display = 'none';
+        modalContainer.style.display = 'none';
     }
+    modalCloseButton.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', closeModal);
 
-    function stopRecording() {
-      if (recorder && recorder.state !== "inactive") {
-        recorder.stop();
-        recordBtn.textContent = "Start Recording";
-        recordBtn.style.backgroundColor = "#444";
-      }
-    }
-  </script>
+    // --- Start the app ---
+    initialize();
+});
+</script>
 </body>
 </html>
