@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Touch Blackboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cabin+Sketch:wght@400;700&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: 'Cabin Sketch', cursive;
+    }
+
+    .blackboard {
+      background-color: #222;
+      border: 10px solid #8B4513;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      position: relative;
+      width: 90vw;
+      max-width: 900px;
+      height: 500px;
+      touch-action: none;
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: crosshair;
+    }
+
+    .clear-btn, .record-btn {
+      position: absolute;
+      padding: 8px 16px;
+      background-color: #444;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .clear-btn:hover, .record-btn:hover {
+      background-color: #666;
+    }
+
+    .clear-btn {
+      top: 10px;
+      right: 10px;
+    }
+
+    .record-btn {
+      top: 50px;
+      right: 10px;
+    }
+
+    h1 {
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      color: white;
+      font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="blackboard" id="board">
+    <h1>Touch to Write ✍️</h1>
+    <canvas id="chalkboard"></canvas>
+    <button class="clear-btn" onclick="clearCanvas()">Clear</button>
+    <button class="record-btn" id="recordBtn">Start Recording</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('chalkboard');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+    }
+
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    ctx.strokeStyle = "#ffffff";
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+
+    let drawing = false;
+
+    function startDraw(e) {
+      drawing = true;
+      ctx.beginPath();
+      ctx.moveTo(getX(e), getY(e));
+      e.preventDefault();
+    }
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.lineTo(getX(e), getY(e));
+      ctx.stroke();
+      e.preventDefault();
+    }
+
+    function endDraw() {
+      drawing = false;
+    }
+
+    function getX(e) {
+      return e.touches ? e.touches[0].clientX - canvas.getBoundingClientRect().left : e.clientX - canvas.getBoundingClientRect().left;
+    }
+
+    function getY(e) {
+      return e.touches ? e.touches[0].clientY - canvas.getBoundingClientRect().top : e.clientY - canvas.getBoundingClientRect().top;
+    }
+
+    canvas.addEventListener("mousedown", startDraw);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", endDraw);
+    canvas.addEventListener("mouseleave", endDraw);
+
+    canvas.addEventListener("touchstart", startDraw);
+    canvas.addEventListener("touchmove", draw);
+    canvas.addEventListener("touchend", endDraw);
+    canvas.addEventListener("touchcancel", endDraw);
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // Screen Recording Logic
+    let recorder;
+    let recordedChunks = [];
+    const recordBtn = document.getElementById('recordBtn');
+
+    recordBtn.addEventListener('click', () => {
+      if (recordBtn.textContent === "Start Recording") {
+        startRecording();
+      } else {
+        stopRecording();
+      }
+    });
+
+    function startRecording() {
+      const stream = canvas.captureStream(30); // 30 FPS
+      recorder = new MediaRecorder(stream, { mimeType: "video/webm" });
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunks.push(e.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(recordedChunks, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "chalkboard_recording.webm";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        recordedChunks = [];
+      };
+
+      recorder.start();
+      recordBtn.textContent = "Stop Recording";
+      recordBtn.style.backgroundColor = "#a00";
+    }
+
+    function stopRecording() {
+      if (recorder && recorder.state !== "inactive") {
+        recorder.stop();
+        recordBtn.textContent = "Start Recording";
+        recordBtn.style.backgroundColor = "#444";
+      }
+    }
+  </script>
+</body>
+</html>
